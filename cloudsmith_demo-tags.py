@@ -8,18 +8,13 @@ from datetime import datetime
 
 BASE_URL = "https://api.cloudsmith.io/v1"
 API_KEY = "cf48cdbf6d70dcd26df982bfc6a46fe3f953787d"
-
+OWNER = "cloudsmith"
+REPOS = ["actions", "examples", "testing-public"]
 
 # Setup logging to Splunk
 SPLUNK_SERVER = "server"
 SPLUNK_SERVER_PORT = "port"
 SPLUNK_HEC_TOKEN = "token"
-
-
-
-OWNER = "cloudsmith"
-REPOS = ["actions", "examples", "testing-public"]
-
 
 def auth_header():
     return {"accept": "application/json",
