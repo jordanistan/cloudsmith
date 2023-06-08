@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 BASE_URL = "https://api.cloudsmith.io/v1"
-API_KEY = "cf48cdbf6d70dcd26df982bfc6a46fe3f953787d"
+API_KEY = "redacted"
 
 
 # Setup logging to Splunk
