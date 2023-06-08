@@ -1,16 +1,20 @@
 import requests
 import json
 import time
+import socket
+from splunk_http_event_collector import http_event_collector
 from datetime import datetime
+
 
 BASE_URL = "https://api.cloudsmith.io/v1"
 API_KEY = "cf48cdbf6d70dcd26df982bfc6a46fe3f953787d"
 
 
 # Setup logging to Splunk
-SPLUNK_SERVER = "http-inputs.acme.splunkcloud.com"
-SPLUNK_SERVER_PORT = "8088"
-SPLUNK_HEC_TOKEN = "REPLACE_ME"
+SPLUNK_SERVER = "server"
+SPLUNK_SERVER_PORT = "port"
+SPLUNK_HEC_TOKEN = "token"
+
 
 
 OWNER = "cloudsmith"
@@ -73,52 +77,49 @@ def FOR_WRITING_DATA_TO_JSON_FILE():
             indent=4
         )
 
-
-
-class HttpEventCollector:
-
-    def __init__(
-            self,
-            token,
-            http_event_server,
-            host="",
-            port='8088'):
+class http_event_collector:
+    
+    def __init__(self, token, server, http_event_port="8088", input_type="json", host="", http_event_server_ssl=False):
         self.token = token
-        self.currentByteLength = 0
-        self.input_type = "json"
-        self.includeTime = True 
-        self.host = host
-        protocol = 'http'
-        input_url = '/event'
-        self.server_uri = '%s://%s:%s/services/collector%s' % (protocol, http_event_server, port, input_url)
+        self.server = server
+        self.port = http_event_port
+        self.input_type = input_type
+        if host:
+            self.host = host
+        else:
+            self.host = socket.gethostname()
+        self.scheme = "http" if not http_event_server_ssl else "https"
         
-    def send_event(self, payload, meta=None):
-        headers = {'Authorization':'Splunk '+self.token}
-        if self.input_type == 'json':
-            if 'host' not in payload:
-                payload.update({"host":self.host})
-            if self.includeTime and not eventtime and 'time' not in payload:
-                timeOffsetForEmbeddedEpoch = 946684800 
-                eventtime = str(int(time.time()+timeOffsetForEmbeddedEpoch))
-                payload.update({"time":eventtime})
-        if meta:
-            payload.update(meta)
-        event = []
-        if self.input_type == 'json':
-            event.append(json.dumps(payload))
-        r = requests.post(self.server_uri, data=event[0], headers=headers)
-        print(r.text)
-
+    def get_auth(self):
+        return {"Authorization": f"Splunk {self.token}"}
+    
+    def get_uri(self):
+        return f"{self.scheme}://{self.server}:{self.port}/services/collector/event"
+    
+    def send_event(self, data):
+        payload = {"event": data}
+        uri = self.get_uri()
+        auth = self.get_auth()
+        resp = requests.post(uri, json=payload, headers=auth)
+        print(resp)
+        return resp
 
 def FOR_SENDING_DATA_TO_SPLUNK():
-    splunk = HttpEventCollector(SPLUNK_HEC_TOKEN, SPLUNK_SERVER, port=SPLUNK_SERVER_PORT)
+    host = socket.gethostname()
+    splunk_event = http_event_collector(
+        SPLUNK_HEC_TOKEN, 
+        SPLUNK_SERVER, 
+        http_event_port=SPLUNK_SERVER_PORT, 
+        input_type="json", 
+        http_event_server_ssl=False, 
+        host=host
+    )
     for repo in REPOS:
         records = get_owner_repos(OWNER, repo)
         payload = {repo: records}
-        meta = {"sourcetype": "cloudsmith:vuln-appsec", 
-                "index": "vuln-appsec", 
-                "time": datetime.timestamp(datetime.today())}
-        splunk.send_event(payload, meta=meta)
-
+        resp = splunk_event.send_event(payload)
+        print(resp)
+        
+    
 if __name__ == "__main__":
     FOR_SENDING_DATA_TO_SPLUNK()
