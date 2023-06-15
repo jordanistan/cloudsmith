@@ -26,7 +26,7 @@ def main(hec_token, hec_url):
 
 def hec_logging_setup(hec_token, hec_domain):
     hec_server = http_event_collector(hec_token, hec_domain)
-    hec_server.sourcetype = "codeql"
+    hec_server.sourcetype = "22"
     hec_server.index = "vuln"
     return hec_server
 
