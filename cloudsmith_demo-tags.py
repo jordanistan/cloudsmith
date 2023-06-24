@@ -68,7 +68,7 @@ def FOR_WRITING_DATA_TO_JSON_FILE():
         output[repo] = records
         json.dump(
             output,
-            open(f"{OWNER}-{repo}-vulnerability-scans.json", "wt", encoding="utf8"),
+            open(f"{OWNER}-{repo}-vulnerability-june-22-scans.json", "wt", encoding="utf8"),
             indent=4
         )
 

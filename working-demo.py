@@ -2,9 +2,7 @@ import requests
 import json
 
 BASE_URL = "https://api.cloudsmith.io/v1"
-API_KEY = "REDACTED"
-
-
+API_KEY = "cf48cdbf6d70dcd26df982bfc6a46fe3f953787d"
 OWNER = "cloudsmith"
 REPOS = ["actions", "examples", "testing-public"]
 
@@ -61,7 +59,7 @@ def main():
         output[repo] = records
         json.dump(
             output,
-            open(f"{OWNER}-{repo}-vulnerability-scans.json", "wt", encoding="utf8"),
+            open(f"{OWNER}-{repo}-vulnerability-june-22-scans.json", "wt", encoding="utf8"),
             indent=4
         )
 
