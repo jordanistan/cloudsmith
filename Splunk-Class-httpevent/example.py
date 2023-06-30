@@ -1,4 +1,4 @@
-from splunk_http_event_collector import http_event_collector 
+from test.splunk_http_event_collector import http_event_collector 
 import random
 import json
 import logging

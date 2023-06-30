@@ -61,33 +61,38 @@ class CloudSmithQuery:
     def get_all_packages(self, repo):
         url = f"{Constants.BASE_URL}/packages/{self.owner}/{repo}/"
         response = requests.get(url, headers=self._auth_header())
+        print(response)
         return response.json()
 
     def _get_package_vulnerabilities(self, repo, package):
         package_id = package[Fields.PACKAGE_ID]
         url = f"{Constants.BASE_URL}/vulnerabilities/{self.owner}/{repo}/{package_id}/"
         response = requests.get(url, headers=self._auth_header())
+        print(response)
         return response.json()
 
     def _get_scan_data(self, repo, package, scan_id):
         package_id = package[Fields.PACKAGE_ID]
         url = f"{Constants.BASE_URL}/vulnerabilities/{self.owner}/{repo}/{package_id}/{scan_id}/"
         response = requests.get(url, headers=self._auth_header())
+        print(response)
         return response.json()
 
     def get_vulnerability_info(self, repo, package):
         """ get all vulnerability info for this package & attach it to the package's info"""
         # make a copy of the package object so that we can add the vulnerability data
         # without modifying any of the package object itself
+        print(package)
         package_with_vulnerability_info = package
         scans = []
         for scan in self._get_package_vulnerabilities(repo, package):
+            print(scan)
             assert package[Fields.PACKAGE_ID] == scan["package"]["identifier"] # sanity check
             scan_id = scan["identifier"]
             results = self._get_scan_data(repo, package, scan_id)
             scans.append(results)
 
-        package[Fields.PACKAGE_VULNERABILITY] = scans
+        package_with_vulnerability_info[Fields.PACKAGE_VULNERABILITY] = scans
         return package_with_vulnerability_info
 
     def matches_severity(self, package):
