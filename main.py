@@ -1,3 +1,13 @@
+# This should work with Python 3.6 and above.
+# This script will take a JSON file and flatten it.  It will then extract the keys specified in the keys_to_extract list.
+# It will then write the flattened JSON to a file called flattened.json.
+# It will then query the Cloudsmith API for the owner and repos specified.
+# It will then query the vulnerabilities endpoint for the owner, repo, and package specified.
+# It will then check if there are any critical or high vulnerabilities in the records.
+# It will then print out the package name and repo name if there are any critical or high vulnerabilities.
+# It will then write the output to a file called output.json.
+
+
 import requests
 import json
 import os
